@@ -10,3 +10,18 @@ router.get("/", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+// thêm ca dạy mới
+router.post("/", async (req, res) => {
+  const Schedule = new Schedule({
+    teacherId: req.body.teacherId,
+    studentId: req.body.studentId,
+    date: req.body.date,
+    time: req.body.time,
+  });
+  try {
+    const newSchedule = await Schedule.save();
+    res.status(201).json(newSchedule);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
