@@ -38,3 +38,15 @@ router.put("/:id", async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
+// xóa chi phí
+router.delete("/:id", async (req, res) => {
+  try {
+    const deletedExpense = await Expense.findByIdAndDelete(req.params.id);
+    if (!deletedExpense)
+      return res.status(404).json({ message: "khong tim thay chi phi" });
+    res.json({ message: "xoa chi phi thanh cong" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+module.exports = router;
