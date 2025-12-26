@@ -40,3 +40,15 @@ router.put("/:id", async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
+// xóa ca dạy
+router.delete("/:id", async (req, res) => {
+  try {
+    const deletedSchedule = await Schedule.findByIdAndDelete(req.params.id);
+    if (!deletedSchedule)
+      return res.status(404).json({ message: "khong tim thay ca day" });
+    res.json({ message: "xoa ca day thanh cong" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+module.exports = router;
