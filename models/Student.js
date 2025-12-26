@@ -1,9 +1,12 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
-const studentSchema = new mongoose.Schema({
-  name: String,
-  age: Number,
-  level: String,
-});
+const studentSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    age: { type: Number, required: true },
+    level: { type: String, required: true },
+  },
+  { timestamps: true }
+); // thêm createdAt và updatedAt
 
-export default mongoose.model("Student", studentSchema);
+module.exports = mongoose.model("Student", studentSchema);

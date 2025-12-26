@@ -1,10 +1,21 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
-const scheduleSchema = new mongoose.Schema({
-  teacherId: { type: mongoose.Schema.Types.ObjectId, ref: "Teacher" },
-  studentId: { type: mongoose.Schema.Types.ObjectId, ref: "Student" },
-  date: String,
-  time: String,
-});
+const scheduleSchema = new mongoose.Schema(
+  {
+    teacherId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Teacher",
+      required: true,
+    },
+    studentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Student",
+      required: true,
+    },
+    date: { type: String, required: true },
+    time: { type: String, required: true },
+  },
+  { timestamps: true }
+); // tự động thêm createdAt và updatedAt
 
-export default mongoose.model("Schedule", scheduleSchema);
+module.exports = mongoose.model("Schedule", scheduleSchema);

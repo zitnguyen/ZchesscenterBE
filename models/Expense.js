@@ -1,8 +1,11 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
-const expenseSchema = new mongoose.Schema({
-  month: { type: String, required: true },
-  amount: { type: Number, required: true },
-});
+const expenseSchema = new mongoose.Schema(
+  {
+    month: { type: String, required: true },
+    amount: { type: Number, required: true },
+  },
+  { timestamps: true }
+); // tùy chọn, thêm createdAt và updatedAt
 
-export default mongoose.model("Expense", expenseSchema);
+module.exports = mongoose.model("Expense", expenseSchema);

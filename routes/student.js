@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const Student = require("../models/Student");
-const authMiddleware = require("../middleware/auth"); // để phân quyền nếu muốn
+const { verifyToken, verifyAdmin } = require("../middleware/auth");
 
 // lấy danh sách học viên
-router.get("/", authMiddleware, async (req, res) => {
+router.get("/", verifyToken, async (req, res) => {
   try {
     const students = await Student.find();
     res.json(students);
@@ -14,7 +14,7 @@ router.get("/", authMiddleware, async (req, res) => {
 });
 
 // lấy học viên theo id
-router.get("/:id", authMiddleware, async (req, res) => {
+router.get("/:id", verifyToken, async (req, res) => {
   try {
     const student = await Student.findById(req.params.id);
     if (!student) return res.status(404).json({ message: "Not found" });
@@ -25,7 +25,7 @@ router.get("/:id", authMiddleware, async (req, res) => {
 });
 
 //thêm học viên
-router.post("/", authMiddleware, async (req, res) => {
+router.post("/", verifyToken, async (req, res) => {
   const { name, age, level } = req.body;
   const student = new Student({ name, age, level });
   try {
@@ -37,7 +37,7 @@ router.post("/", authMiddleware, async (req, res) => {
 });
 
 //cập nhật học viên
-router.put("/:id", authMiddleware, async (req, res) => {
+router.put("/:id", verifyToken, async (req, res) => {
   try {
     const updatedStudent = await Student.findByIdAndUpdate(
       req.params.id,
@@ -52,7 +52,7 @@ router.put("/:id", authMiddleware, async (req, res) => {
 });
 
 //xóa học viên
-router.delete("/:id", authMiddleware, async (req, res) => {
+router.delete("/:id", verifyToken, async (req, res) => {
   try {
     const deletedStudent = await Student.findByIdAndDelete(req.params.id);
     if (!deletedStudent) return res.status(404).json({ message: "Not found" });
