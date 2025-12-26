@@ -41,3 +41,14 @@ router.put("/:id",async (req, res)=>{
         res.status(400).json({message: err.message});
     }
 });
+// xóa gv
+router.delete("/:id", async (req, res)=>{
+    try{
+        const deletedTeacher = await Teacher.findByIdAndDelete(req.params.id);
+        if(!deletedTeacher) return res.status(404).json({message: "khong tim thay giao vien"});
+        res.json({message: "xoa giao vien thanh cong"});
+    }
+    catch(err){
+        res.status(500).json({message: err.message});
+    }});
+module.exports = router;
