@@ -23,3 +23,18 @@ router.post("/", async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
+// cập nhật chi phí
+router.put("/:id", async (req, res) => {
+  try {
+    const updatedExpense = await Expense.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    if (!updatedExpense)
+      return res.status(404).json({ message: "khong tim thay chi phi" });
+    res.json(updatedExpense);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
