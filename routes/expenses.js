@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const Expense = require("../models/Expense");
+const { verifyToken, verifyAdmin } = require("../middleware/auth");
 // lấy danh sách chi phí
-router.get("/", async (req, res) => {
+router.get("/", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const expenses = await Expense.find();
     res.json(expenses);
@@ -11,7 +12,7 @@ router.get("/", async (req, res) => {
   }
 });
 // thêm chi phí
-router.post("/", async (req, res) => {
+router.post("/", verifyToken, verifyAdmin, async (req, res) => {
   const expense = new Expense({
     month: req.body.month,
     amount: req.body.amount,
@@ -24,7 +25,7 @@ router.post("/", async (req, res) => {
   }
 });
 // cập nhật chi phí
-router.put("/:id", async (req, res) => {
+router.put("/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const updatedExpense = await Expense.findByIdAndUpdate(
       req.params.id,
@@ -39,7 +40,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 // xóa chi phí
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const deletedExpense = await Expense.findByIdAndDelete(req.params.id);
     if (!deletedExpense)
