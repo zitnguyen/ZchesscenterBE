@@ -26,4 +26,18 @@ router.post("/", async (req, res) => {
         res.status(400).json({message: err.message});
     }
     });
-    
+// cập nhật gv
+router.put("/:id",async (req, res)=>{
+    try{
+        const updatedTeacher = await Teacher.findByIdAndUpdate(
+            req.params.id,
+            {$set: req.body},
+            {new: true}
+        );
+        if(!updatedTeacher) return res.status(404).json({message: "khong tim thay giao vien"});
+        res.json(updatedTeacher);
+    }
+    catch(err){
+        res.status(400).json({message: err.message});
+    }
+});
