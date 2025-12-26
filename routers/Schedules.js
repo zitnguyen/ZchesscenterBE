@@ -25,3 +25,18 @@ router.post("/", async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
+// cập nhật ca dạy
+router.put("/:id", async (req, res) => {
+  try {
+    const updatedSchedule = await Schedule.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    if (!updatedSchedule)
+      return res.status(404).json({ message: "khong tim thay ca day" });
+    res.json(updatedSchedule);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
