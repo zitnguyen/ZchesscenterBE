@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const Teacher = require("../models/teacher");
-const { verifyToken, verifyAdmin } = require("../middleware/auth");
+const { verifyToken } = require("../middleware/auth");
 // lấy danh sách gv
-router.get("/", verifyToken, verifyAdmin, async (req, res) => {
+router.get("/", verifyToken, async (req, res) => {
   try {
     const teachers = await Teacher.find();
     res.json(teachers);
@@ -12,7 +12,7 @@ router.get("/", verifyToken, verifyAdmin, async (req, res) => {
   }
 });
 // thêm gv mới
-router.post("/", verifyToken, verifyAdmin, async (req, res) => {
+router.post("/", verifyToken, async (req, res) => {
   try {
     const teacher = new Teacher({
       name: req.body.name,
@@ -27,7 +27,7 @@ router.post("/", verifyToken, verifyAdmin, async (req, res) => {
   }
 });
 // cập nhật gv
-router.put("/:id", verifyToken, verifyAdmin, async (req, res) => {
+router.put("/:id", verifyToken, async (req, res) => {
   try {
     const updatedTeacher = await Teacher.findByIdAndUpdate(
       req.params.id,
@@ -42,7 +42,7 @@ router.put("/:id", verifyToken, verifyAdmin, async (req, res) => {
   }
 });
 // xóa gv
-router.delete("/:id", verifyToken, verifyAdmin, async (req, res) => {
+router.delete("/:id", verifyToken, async (req, res) => {
   try {
     const deletedTeacher = await Teacher.findByIdAndDelete(req.params.id);
     if (!deletedTeacher)
