@@ -38,3 +38,15 @@ router.put("/:id", async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
+// xóa doanh thu
+router.delete("/:id", async (req, res) => {
+  try {
+    const deletedRevenue = await Revenue.findByIdAndDelete(req.params.id);
+    if (!deletedRevenue)
+      return res.status(404).json({ message: "khong tim thay doanh thu" });
+    res.json({ message: "xoa doanh thu thanh cong" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+module.exports = router;
