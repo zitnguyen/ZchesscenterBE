@@ -4,7 +4,7 @@ const Revenue = require("../models/Revenue");
 const { verifyToken, verifyAdmin } = require("../middleware/auth");
 
 // Lấy danh sách doanh thu (có thể cho tất cả user xem)
-router.get("/", verifyToken, async (req, res) => {
+router.get("/", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const revenues = await Revenue.find();
     res.json(revenues);
