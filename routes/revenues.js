@@ -1,8 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const Revenue = require("../models/Revenue");
-// lấy danh sách doanh thu
-router.get("/", async (req, res) => {
+const { verifyToken, verifyAdmin } = require("../middleware/auth");
+
+// Lấy danh sách doanh thu (có thể cho tất cả user xem)
+router.get("/", verifyToken, async (req, res) => {
   try {
     const revenues = await Revenue.find();
     res.json(revenues);
@@ -10,8 +12,9 @@ router.get("/", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-// thêm doanh thu
-router.post("/", async (req, res) => {
+
+// Thêm doanh thu (chỉ admin)
+router.post("/", verifyToken, verifyAdmin, async (req, res) => {
   const revenue = new Revenue({
     month: req.body.month,
     amount: req.body.amount,
@@ -23,8 +26,9 @@ router.post("/", async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
-// cập nhật doanh thu
-router.put("/:id", async (req, res) => {
+
+// Cập nhật doanh thu (chỉ admin)
+router.put("/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const updatedRevenue = await Revenue.findByIdAndUpdate(
       req.params.id,
@@ -32,21 +36,23 @@ router.put("/:id", async (req, res) => {
       { new: true }
     );
     if (!updatedRevenue)
-      return res.status(404).json({ message: "khong tim thay doanh thu" });
+      return res.status(404).json({ message: "không tìm thấy doanh thu" });
     res.json(updatedRevenue);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 });
-// xóa doanh thu
-router.delete("/:id", async (req, res) => {
+
+// Xóa doanh thu (chỉ admin)
+router.delete("/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const deletedRevenue = await Revenue.findByIdAndDelete(req.params.id);
     if (!deletedRevenue)
-      return res.status(404).json({ message: "khong tim thay doanh thu" });
-    res.json({ message: "xoa doanh thu thanh cong" });
+      return res.status(404).json({ message: "không tìm thấy doanh thu" });
+    res.json({ message: "xóa doanh thu thành công" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
+
 module.exports = router;
