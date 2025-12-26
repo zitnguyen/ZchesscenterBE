@@ -10,3 +10,16 @@ router.get("/", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+// thêm chi phí
+router.post("/", async (req, res) => {
+  const expense = new Expense({
+    month: req.body.month,
+    amount: req.body.amount,
+  });
+  try {
+    const newExpense = await expense.save();
+    res.status(201).json(newExpense);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
