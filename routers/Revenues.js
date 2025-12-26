@@ -23,3 +23,18 @@ router.post("/", async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
+// cập nhật doanh thu
+router.put("/:id", async (req, res) => {
+  try {
+    const updatedRevenue = await Revenue.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    if (!updatedRevenue)
+      return res.status(404).json({ message: "khong tim thay doanh thu" });
+    res.json(updatedRevenue);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
