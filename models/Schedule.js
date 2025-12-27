@@ -4,18 +4,18 @@ const scheduleSchema = new mongoose.Schema(
   {
     teacherId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Teacher",
+      ref: "User", // sửa từ "Teacher" → "User"
       required: true,
     },
     studentId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Student",
+      ref: "User", // sửa từ "Student" → "User"
       required: true,
     },
     date: { type: String, required: true },
     time: { type: String, required: true },
   },
   { timestamps: true }
-); // tự động thêm createdAt và updatedAt
+);
 
 module.exports = mongoose.model("Schedule", scheduleSchema);

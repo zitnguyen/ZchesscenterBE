@@ -32,6 +32,8 @@ router.get("/", verifyToken, async (req, res) => {
 
     res.json(result);
   } catch (err) {
+    console.error(err); // log chi tiết
+
     res.status(500).json({ message: err.message });
   }
 });
