@@ -25,7 +25,7 @@ router.get("/:id", verifyToken, async (req, res) => {
 });
 
 //thêm học viên
-router.post("/", verifyToken, async (req, res) => {
+router.post("/", verifyToken, verifyAdmin, async (req, res) => {
   const { name, age, level } = req.body;
   const student = new Student({ name, age, level });
   try {
@@ -37,7 +37,7 @@ router.post("/", verifyToken, async (req, res) => {
 });
 
 //cập nhật học viên
-router.put("/:id", verifyToken, async (req, res) => {
+router.put("/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const updatedStudent = await Student.findByIdAndUpdate(
       req.params.id,
@@ -52,7 +52,7 @@ router.put("/:id", verifyToken, async (req, res) => {
 });
 
 //xóa học viên
-router.delete("/:id", verifyToken, async (req, res) => {
+router.delete("/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const deletedStudent = await Student.findByIdAndDelete(req.params.id);
     if (!deletedStudent) return res.status(404).json({ message: "Not found" });

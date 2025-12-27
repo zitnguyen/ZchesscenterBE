@@ -1,55 +1,79 @@
 const express = require("express");
 const router = express.Router();
-const Teacher = require("../models/teacher");
-const { verifyToken } = require("../middleware/auth");
-// lấy danh sách gv
-router.get("/", verifyToken, async (req, res) => {
+const User = require("../models/User");
+const bcrypt = require("bcryptjs");
+const { verifyToken, verifyAdmin } = require("../middleware/auth");
+
+// GET tất cả giáo viên
+router.get("/", verifyToken, verifyAdmin, async (req, res) => {
   try {
-    const teachers = await Teacher.find();
+    const teachers = await User.find({ role: "teacher" }).select("-password");
     res.json(teachers);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ error: err.message });
   }
 });
-// thêm gv mới
-router.post("/", verifyToken, async (req, res) => {
+
+// POST thêm giáo viên
+router.post("/", verifyToken, verifyAdmin, async (req, res) => {
   try {
-    const teacher = new Teacher({
-      name: req.body.name,
-      email: req.body.email,
-      role: req.body.role,
+    const { name, email, password } = req.body;
+
+    const exists = await User.findOne({ email });
+    if (exists) return res.status(400).json({ message: "Email đã tồn tại" });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const teacher = new User({
+      name,
+      email,
+      password: hashedPassword,
+      role: "teacher",
     });
 
-    const newTecher = await teacher.save();
-    res.status(201).json(newTecher);
+    await teacher.save();
+    res.status(201).json({ message: "Giáo viên đã được tạo", teacher });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(500).json({ error: err.message });
   }
 });
-// cập nhật gv
-router.put("/:id", verifyToken, async (req, res) => {
+
+// PUT cập nhật giáo viên
+router.put("/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
-    const updatedTeacher = await Teacher.findByIdAndUpdate(
+    const { name, email, password } = req.body;
+    const updateData = { name, email };
+
+    if (password) {
+      const hashed = await bcrypt.hash(password, 10);
+      updateData.password = hashed;
+    }
+
+    const updatedTeacher = await User.findByIdAndUpdate(
       req.params.id,
-      { $set: req.body },
+      updateData,
       { new: true }
-    );
+    ).select("-password");
     if (!updatedTeacher)
-      return res.status(404).json({ message: "khong tim thay giao vien" });
-    res.json(updatedTeacher);
+      return res.status(404).json({ message: "Không tìm thấy giáo viên" });
+
+    res.json({ message: "Cập nhật thành công", updatedTeacher });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(500).json({ error: err.message });
   }
 });
-// xóa gv
-router.delete("/:id", verifyToken, async (req, res) => {
+
+// DELETE xóa giáo viên
+router.delete("/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
-    const deletedTeacher = await Teacher.findByIdAndDelete(req.params.id);
-    if (!deletedTeacher)
-      return res.status(404).json({ message: "khong tim thay giao vien" });
-    res.json({ message: "xoa giao vien thanh cong" });
+    const deleted = await User.findByIdAndDelete(req.params.id);
+    if (!deleted)
+      return res.status(404).json({ message: "Không tìm thấy giáo viên" });
+
+    res.json({ message: "Xóa giáo viên thành công" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ error: err.message });
   }
 });
+
 module.exports = router;

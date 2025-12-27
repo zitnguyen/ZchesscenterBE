@@ -1,54 +1,97 @@
 const express = require("express");
 const router = express.Router();
 const Schedule = require("../models/Schedule");
-// lấy danh sách ca dạy
-router.get("/", async (req, res) => {
+const { verifyToken } = require("../middleware/auth");
+
+/**
+ * GET /schedules
+ * - Admin: thấy tất cả
+ * - Teacher: chỉ thấy ca dạy của mình
+ */
+router.get("/", verifyToken, async (req, res) => {
   try {
-    const schedules = await Schedule.find().populate("teacherId studentId");
-    res.json(schedules);
+    let query = {};
+
+    // nếu là teacher → chỉ lấy ca dạy của teacher đó
+    if (req.user.role === "teacher") {
+      query.teacherId = req.user.id;
+    }
+
+    const schedules = await Schedule.find(query)
+      .populate("teacherId", "name")
+      .populate("studentId", "name");
+
+    // map dữ liệu cho FE dễ dùng
+    const result = schedules.map((s) => ({
+      _id: s._id,
+      teacherName: s.teacherId?.name,
+      studentName: s.studentId?.name,
+      date: s.date,
+      time: s.time,
+    }));
+
+    res.json(result);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
-// thêm ca dạy mới
-router.post("/", async (req, res) => {
-  const Schedule = new Schedule({
-    teacherId: req.body.teacherId,
-    studentId: req.body.studentId,
-    date: req.body.date,
-    time: req.body.time,
-  });
+
+/**
+ * POST /schedules
+ * Thêm ca dạy (Admin)
+ */
+router.post("/", verifyToken, async (req, res) => {
   try {
-    const newSchedule = await Schedule.save();
-    res.status(201).json(newSchedule);
+    const newSchedule = new Schedule({
+      teacherId: req.body.teacherId,
+      studentId: req.body.studentId,
+      date: req.body.date,
+      time: req.body.time,
+    });
+
+    const savedSchedule = await newSchedule.save();
+    res.status(201).json(savedSchedule);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 });
-// cập nhật ca dạy
-router.put("/:id", async (req, res) => {
+
+/**
+ * PUT /schedules/:id
+ */
+router.put("/:id", verifyToken, async (req, res) => {
   try {
     const updatedSchedule = await Schedule.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true }
     );
-    if (!updatedSchedule)
-      return res.status(404).json({ message: "khong tim thay ca day" });
+
+    if (!updatedSchedule) {
+      return res.status(404).json({ message: "Không tìm thấy ca dạy" });
+    }
+
     res.json(updatedSchedule);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 });
-// xóa ca dạy
-router.delete("/:id", async (req, res) => {
+
+/**
+ * DELETE /schedules/:id
+ */
+router.delete("/:id", verifyToken, async (req, res) => {
   try {
     const deletedSchedule = await Schedule.findByIdAndDelete(req.params.id);
-    if (!deletedSchedule)
-      return res.status(404).json({ message: "khong tim thay ca day" });
-    res.json({ message: "xoa ca day thanh cong" });
+
+    if (!deletedSchedule) {
+      return res.status(404).json({ message: "Không tìm thấy ca dạy" });
+    }
+
+    res.json({ message: "Xóa ca dạy thành công" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
+
 module.exports = router;

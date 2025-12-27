@@ -17,11 +17,29 @@ const verifyToken = (req, res, next) => {
   }
 };
 
+// Middleware kiểm tra admin
 const verifyAdmin = (req, res, next) => {
+  // Kiểm tra xem req.user có tồn tại không
+  if (!req.user) {
+    return res.status(401).json({ message: "Bạn cần đăng nhập" });
+  }
+
   if (req.user.role !== "admin") {
     return res.status(403).json({ message: "Chỉ admin mới được phép" });
   }
   next();
 };
 
-module.exports = { verifyToken, verifyAdmin };
+// Middleware kiểm tra teacher (nếu cần)
+const verifyTeacher = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({ message: "Bạn cần đăng nhập" });
+  }
+
+  if (req.user.role !== "teacher") {
+    return res.status(403).json({ message: "Chỉ teacher mới được phép" });
+  }
+  next();
+};
+
+module.exports = { verifyToken, verifyAdmin, verifyTeacher };
