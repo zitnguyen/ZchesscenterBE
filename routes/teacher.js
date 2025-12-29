@@ -5,7 +5,7 @@ const bcrypt = require("bcryptjs");
 const { verifyToken, verifyAdmin } = require("../middleware/auth");
 
 // GET tất cả giáo viên
-router.get("/", verifyToken, verifyAdmin, async (req, res) => {
+router.get("/", verifyToken, async (req, res) => {
   try {
     const teachers = await User.find({ role: "teacher" }).select("-password");
     res.json(teachers);

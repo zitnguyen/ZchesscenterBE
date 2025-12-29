@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/User"); // hoặc đường dẫn model user của bạn
 
-const verifyToken = (req, res, next) => {
+const verifyToken = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader)
     return res.status(401).json({ message: "Bạn cần đăng nhập" });
@@ -10,7 +11,14 @@ const verifyToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // lưu thông tin user (id, role) vào req.user
+
+    // Kiểm tra user tồn tại trong DB
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return res.status(401).json({ message: "Tài khoản đã bị xóa" });
+    }
+
+    req.user = { id: user._id, role: user.role }; // lưu thông tin user vào req.user
     next();
   } catch (err) {
     return res.status(403).json({ message: "Token hết hạn hoặc không hợp lệ" });
@@ -19,7 +27,6 @@ const verifyToken = (req, res, next) => {
 
 // Middleware kiểm tra admin
 const verifyAdmin = (req, res, next) => {
-  // Kiểm tra xem req.user có tồn tại không
   if (!req.user) {
     return res.status(401).json({ message: "Bạn cần đăng nhập" });
   }
@@ -30,7 +37,7 @@ const verifyAdmin = (req, res, next) => {
   next();
 };
 
-// Middleware kiểm tra teacher (nếu cần)
+// Middleware kiểm tra teacher
 const verifyTeacher = (req, res, next) => {
   if (!req.user) {
     return res.status(401).json({ message: "Bạn cần đăng nhập" });
