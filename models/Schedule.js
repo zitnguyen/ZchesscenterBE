@@ -9,7 +9,7 @@ const scheduleSchema = new mongoose.Schema(
     },
     studentId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // sửa từ "Student" → "User"
+      ref: "Student", // sửa từ "Student" → "User"
       required: true,
     },
     date: { type: String, required: true },
